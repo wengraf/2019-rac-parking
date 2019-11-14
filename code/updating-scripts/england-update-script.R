@@ -19,14 +19,14 @@
 
 # which fiscal year do you want to produce a report for?
 # NB: the current year is the year in which the fiscal year starts
-current.year <- 2017
+current.year <- 2018
 
 # if you want to produce a report based on current data - but for a previous year
 # set add.new.data to FALSE. Run the rest of the script.
 # If you want to add new data for the current fiscal year then change to 
 # TRUE and proceed through the script. Alyways make sure the data you are entering 
 # matches the current.year variable above
-add.new.data <- FALSE
+add.new.data <- TRUE
 
 
 # If you have already produced an .Rmd file by running this script, and have 
@@ -51,19 +51,19 @@ if (add.new.data){
   # England outturn data (Income and Expenditure data)                        #
   #############################################################################
   # title as it will appear in the references:
-  eng.i.e.title <- "Local authority revenue expenditure and financing England: 2017-18, individual local authority data - outturn"
+  eng.i.e.title <- "Local authority revenue expenditure and financing England: 2018-19, individual local authority data - outturn"
 
   # url of the file:
-  eng.i.e.url <- "https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/659775/RO2_2016-17_data_by_LA.xlsx"
+  eng.i.e.url <- "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/846282/RO2_2018-19_data_by_LA.xlsx"
 
   # year published, as it will appear in the references:
-  eng.i.e.year.published <- 2018
+  eng.i.e.year.published <- 2019
 
   ## replace with date of access to data:
-  eng.i.e.date.accessed <- "07.10.2019"
+  eng.i.e.date.accessed <- "14.11.2019"
 
   # path and name of file where you have saved it:
-  eng.i.e.file <- "data/01-raw/orig.eng-17-18.xlsx"
+  eng.i.e.file <- "data/01-raw/orig.eng-18-19.xlsx"
 
   # on which sheet is the LA data on?
   eng.i.e.sh <- 3
@@ -72,7 +72,7 @@ if (add.new.data){
   eng.i.e.first <- 8
   
   # on the LA sheet, which row is the last row of the table?
-  eng.i.e.last <- 452
+  eng.i.e.last <- 451
   
   # on the LA sheet, which column has the LA names
   eng.i.e.la.name <- "C"
@@ -121,16 +121,16 @@ if (add.new.data){
   eng.budg.title <- "Local authority revenue expenditure and financing England: 2018 to 2019 budget (Revenue Account budget)"
   
   # url of the file:
-  eng.budg.url <- "https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/720343/RA_2018-19_data_by_LA.xlsx"
+  eng.budg.url <- "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/812517/RA_2019-20_data_by_LA.xlsx"
   
   # year published, as it will appear in the references:
-  eng.budg.year.published <- 2018
+  eng.budg.year.published <- 2019
   
   ## replace with date of access to data:
-  eng.budg.date.accessed <- "07.10.2019"
+  eng.budg.date.accessed <- "14.11.2019"
   
   # path and name of file where you have saved it:
-  eng.budg.file <- "data/01-raw/orig.eng-18-19-budget.xlsx"
+  eng.budg.file <- "data/01-raw/orig.eng-19-20-budget.xlsx"
   
   # on which sheet is the LA data on?
   eng.budg.sh <- 3
@@ -139,7 +139,7 @@ if (add.new.data){
   eng.budg.first <- 8
   
   # on the LA sheet, which row is the last row of the table?
-  eng.budg.last <- 450
+  eng.budg.last <- 442
   
   # on the LA sheet, which column has the LA names?
   eng.budg.la.name <- "C"
@@ -166,23 +166,23 @@ if (add.new.data){
   eng.nhm.title <- "{Statement of Accounts}"
 
   # url of the file:
-  eng.nhm.url <- "https://www.nottinghaminsight.org.uk/d/aAXEduG_"
+  eng.nhm.url <- "https://www.nottinghaminsight.org.uk/d/a1uCEFc"
 
   # year published, as it will appear in the references:
-  eng.nhm.year.published <- 2018
+  eng.nhm.year.published <- 2019
 
   ## replace with date of access to data:
-  eng.nhm.date.accessed <- "4.10.2019"
+  eng.nhm.date.accessed <- "14.11.2019"
 
   # page on which the table "Road Charging Schemes under the Transport Act 2000"
   # can be found 
-  eng.nhm <- 86
+  eng.nhm <- 96
   
   # income from WPL as shown in this table (in thousands, not in millions!):
-  eng.nhm.income.wpl <- 9178
+  eng.nhm.income.wpl <- 10114
   
   # expenditures for WPL as shown in this table (in thousands, not in millions!): 
-  eng.nhm.expend.wpl <- 219
+  eng.nhm.expend.wpl <- 577
   
   # that's all the manual entry done!
 }
@@ -459,3 +459,4 @@ if(nrow(filter(master, country == "England", year == current.year)) == 0) {
 # # the report are saved to /outputs/reports/
 ################################################################################
 ################################################################################
+

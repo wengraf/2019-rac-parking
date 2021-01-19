@@ -26,7 +26,7 @@ current.year <- 2018
 # If you want to add new data that has been publihsed then change to 
 # TRUE and proceed through the script. Alyways make sure the data you are entering 
 # matches the current.year variable. 
-add.new.data <- TRUE
+add.new.data <- FALSE
 
 # If you have already produced an .Rmd file by running this script, and have 
 # made changes to the .Rmd file and just want to recompile it switch to TRUE.
@@ -36,7 +36,7 @@ recompile.rmd <- FALSE
 
 # number of decimal places in text and tables:
 dp.text <- 1
-dp.tables <- 2
+dp.tables <- 1
 
 
 ################################################################################
@@ -62,7 +62,7 @@ if (add.new.data){
 ################################################################################
 ## LOAD PACKAGES AND DATA ######################################################
 ################################################################################
-source("code/functions.R")
+source("code/do-not-touch-scripts/functions.R")
 library(tidyr)
 library(dplyr)
 library(tibble)
@@ -100,6 +100,7 @@ if (add.new.data){
   
   # reshape all three dfs - you can ignore the warnigns here!
   wal.expend.total<- FunWalesReshape(wal.expend.total)
+  
   wal.income.total<- FunWalesReshape(wal.income.total)
   wal.transport.total<- FunWalesReshape(wal.transport.total)
   
@@ -172,6 +173,8 @@ saveRDS(bib.master, "data/03-processed/bib.master.rds")
 # create a bibliography for the wales report
 bib.master %>% 
   filter(fiscyear > current.year - 5, !content %in% c("budget", "pcn", "wpl")) %>% 
+ group_by(country) %>% 
+ filter(country %in% c("GB","Wales") | country %in% c("England","Scotland") & fiscyear == max(fiscyear)) %>%
   mutate(refs = paste0("@", key)) %>% 
   column_to_rownames("key") -> bib.wales
 

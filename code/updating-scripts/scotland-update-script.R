@@ -78,8 +78,6 @@ if (add.new.data){
   # which cell has the Total Roads and Transport "Net revenue Expenditure on a funding basis"?
   sco.i.e.transp.cell <- "D34"
   
-  # On individual LA sheets, which cell has the name of the LA?
-  sco.i.e.auth.cell <- "A1"
   
   # Aberdeen city - separate data source if available? ###########################
   ################################################################################
@@ -134,14 +132,14 @@ decriminalised-parking-enforcement-local-authorities-income-and-expenditure-2016
 ################################################################################
 ################################################################################
 ##                                                                            ##
-##   THE REST OF THIS SCRIPT IS TO BE RUN ONLY -- NO MODIFICATIONS!           ##
+##     THE REST OF THIS SCRIPT IS TO BE RUN ONLY -- NO MODIFICATIONS!         ##
 ##                                                                            ##
 ################################################################################
 ################################################################################
 ################################################################################
 ## LOAD PACKAGES AND DATA ######################################################
 ################################################################################
-source("code/functions.R")
+source("code/do-not-touch-scripts/functions.R")
 library(tidyr)
 library(dplyr)
 library(tibble)
@@ -170,8 +168,7 @@ if (add.new.data){
                     end.sh =  sco.i.e.end.sh,
                     exp.cell =  sco.i.e.exp.cell,
                     inc.cell =  sco.i.e.inc.cell,
-                    transp.cell = sco.i.e.transp.cell,
-                    auth.cell = sco.i.e.auth.cell) -> scotland.i.e.
+                    transp.cell = sco.i.e.transp.cell) -> scotland.i.e.
   
   aberdeen <- data.frame(auth.name = "Aberdeen City",
                          year = current.year,
@@ -331,6 +328,8 @@ if (add.new.data){
   # select a bibliography for the scotland report - only the rows needed
   bib.master %>%
     filter(fiscyear > current.year - 5, !content %in% c("budget", "wpl")) %>%
+   group_by(country) %>%
+   filter(country %in% c("Wales", "Scotland") | country == "England" & fiscyear == max(fiscyear)) %>%
     mutate(refs = paste0("@", key)) %>%
     column_to_rownames("key") -> bib.scotland
   
@@ -341,7 +340,7 @@ if (add.new.data){
              biblatex = FALSE, verbose = FALSE)
   
   # also save the data.frame
-  saveRDS(bib.scotland, paste0("data/03-processed/", report.name, "-bib.rds"))
+   saveRDS(bib.scotland, paste0("data/03-processed/", report.name, "-bib.rds"))
 
 
 

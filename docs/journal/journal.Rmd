@@ -1015,7 +1015,7 @@ OK, so I'll now start working through england.R and the report template. The upd
 * ah, and the surplus changes need to be split between surpluses and deficits.. This was not done in the originals.. 
 * bloody NAs and formatting these tables, such a faff every time. 
 * OK, london surplus table done.
-* Now the england one, top 20. looks like i could deduce Nottingham from there? *later*
+* Now the england one, top 20. looks like i could deduce Nottingham from there? later. No, no WPL now. 
 * the package `english` has the function `ordinal` for writing out ordinal numbers, nice. 
 * finished surpluses. 
 * start on budget comparison. 
@@ -1203,9 +1203,292 @@ next:
 
 * *Technical documentation - add sources info and finish it off (except for England calculations..)*
 
+# Monday 18.11.2019
+
+* how are the LAs matched. via authority name. the reason is probably that i did scotland first and there were no codes in the Excel files there. due to inconsistencies in naming i set up a lookup table for common miss-spellings and alternative spellings for English and Scottish LAs, so when the data is imported they get automatically changed to the same ones we have throughout. you're right though, ONS codes for England would be better, i can change that. i can't for scotland, since they aren't there, and they aren't in the Wales data either, although it doesn't matter much there, since the data is most systematically clean and consistent. 
+
+* going through Ivo's comments. A lot of deletions, all fine.
+* if expenditure change in < 50,000, then that reads as 0.0 million, which looks shit. in that case i'll swhitch it to thousands. 
+* hm, there are some odd looking percentages in the england expenditure chapter? ah, ok, it was thousands somewhere, needed to take that into account, all good.
+* ok, all of Ivo's comments are ok now. 
+* commit
+* Wales comments from Ivo, removes two tables. 
+* commit
+
+# Tuesday 19.1.2019
+
+* finish wales comments form yesterday. ok. send to ivo, commit. 
+* ONS codes for matching england data in import. instead of names. 
+* this means adding the column in the 00-data-entry file first. 
+* OK, added la.code for the "E-code" of the LAs in the england outturn and budget files. 
+* OK, now 01-original-data-import
+* add auth.code to master table. and add to relevant functions. 
+* OK, 01-original-data-import is now ok as well. so all should be fine. ok. 
+* ah, careful, GLA has it's own E-code E5100, now should be fine. 
+* now running the England report i'm getting an odd error 
+```
+Error: package or namespace load failed for ‘sf’ in dyn.load(file, DLLpath = DLLpath, ...):
+ unable to load shared object '/home/mz/.local/share/renv/cache/v4/R-3.6/x86_64-pc-linux-gnu/sf/0.7-6/cb1ce05d12fc9d41090f9eb539674780/sf/libs/sf.so':
+  /lib/libc.so.6: version `GLIBC_2.30' not found (required by /lib/libnspr4.so)
+```
+* try install.packages("sf"), see if that helps. OK, that and restarting it all helped.
+* OK, so ons code matching is done, in actual fact it matches on code and name, so double up, which is maybe overkill, not sure if i should remove that. maybe i should actually. that way i avoid issues if a name change happens that isn't in the lookup tables either. 
+* But no, if i don't use all the common variables, then they get duplicated. so it's ok as it is. 
+* commit
+  
+* Now get the england update script ready for new data. 
+* hm, did i already do this?
+* then test it with the new england data. and then revert to the old repo, so they can try it out themselves. 
+  
+  
+# Wednesday 20.11.2019
+
+
+* ok, so all looks good, commit now with 2017-2018 england data. 
+
+* change outturn name of file from RS to RO2 or whatever.ok
+
+* wpl there's an extra * instead of ".
+
+* what if it's not the final statememnt, but the draft one? for the budget?
+
+* OK, so problem: folkstone and hythe being called shepway. should i add it to the lookup tables? or should i change the full_merge to not look at auth.name. but then i have two columns with auth.name, which isn't good. so lookup table. 
+
+* should this go into the instructions as well? what to do if this happens?
+
+* add folkstone and hythe = shepway to lookup table in 00
+
+* but where is it being run? ok, i think it's fine, it's in the funcitons
+
+* but what abotu this: the budget file has e.g. e1203 for dorset, but this doens't exist in the outturn file. instead there are four dorset rows there. 
+
+* bournemouth christchirch and poole have merged in 2019. the 2018/2019 data is for all three separately. but the 2018/2019 budgeted is for them merged as is the 2019/2020 one. so should i add up the three 2018 ones? 
+
+* same thing with somerset Wet and Taunton, which were tautnotn deane and west somerset
+
+* same thing with East suffolk and west suffolk which used to be some combination of sufolk, mid sufolk and sufolk coastal. 
+
+* all of this maybe doens't matter if i just remove the controls for the numbers of LAs that get imported. but then you're flying blind, i mean how do you know there haven't been any changes like the shepway one?
+
+* I mean the matching doesn't matter anyway, the budgets are never directly compared except for the country as a whole?
+
+* ok, running the script, there is an issue with summary.london.prep where i try to extract numeric from charater, but in this example it has a thousands separator, so it goest to NA
+
+* ok, there is an issue with the second appendix expenditure table. not sure what thouhg.
+
+* but there is also the issue if ranking the LAs with "inf" as largest, which is not true, so fix that. OK. 
+
+* ugh, also the "new" LAs are still problematic, they show up in the appendix tables and mess up the totals hlines if nothing else. need to make sure the tables only have the relevant rows in them, so ones with "income" or whatever data is necessary. 
+
+* still cannot figure out what is wrong with the second expenditure table. trying to see if it's a specific row now. It's not any specific row, but 353 rows is ok, more is not. 
+* removing the cellspec also doesn't make a difference, 355 is ok then, what about if i put cellspec(colours back), yeah, also ok. so 355 is fine. but 1:357 isn't. and 1:356 is ok. wtf. what about 2:357? that's ok. 2: 358? also ok!? hm, this stopped happening? weird, but OK. 
+
+* ffs. maybe i should first make sure i remove the "new" LAs from all of these tables anyway. and then worry about this if it still persisits. OK
+
+* OK, also in england 2017/18 the budget sum is NA now, need to fix that as well. OK, that's fine on a clean start. but what happens if i add the 2018/19 data, that's probbaly the issue, becuase there are now rows with 2018, but an NA budget value... 
+
+* OK, so when i get new outturn data, it should match the previous year's budget LAs. if it doesn't, you end up with NAs, potentially for both the outturn and budget data, since we are doing a full join. 
+
+* So in 2017 there were 353 LAs outturn reports in England and for the 2018-19 budget year the same 353 reported as well. this was ok. 
+
+# Monday 25.11.2019
+
+* So what do i do with new data then. if the new 2018 outturns are not the same as the 2018 budget. OK. the outturns win. but what about the NAs? I think this is OK. 
+
+* or if the 2019 budget data is not for the same 353 LAs we'll get outturn data next year. Which it isn't, there are only 343 LAs in the budget data for 2019, so there are 10 missing. Actually there are 15 additional ones in 2018 and five additional ones in 2019..
+
+* But there's another problem. because i have the 2018 England row with the budget data only, and then in 2018 i add the 2018 row with the transport totals. My current method for adding new data is to first antijoin by c("country", "auth.name", "year"), so that i would overwrite the data if it's already there, and then bind rows with the new ones. OK, this has all now been redone. Now when you add new data for England, it doesn't matter what the budget data was, the new rows will be the ones from the new outturn data. Then the budget data for next year is simply appended on. 
+
+* if the budget data for next year is not reported for all LAs, like for 2019, there should probably be a note made of this? all good.
+
+* OK, there was an errror because the budgeted trasnport variable for all of england got lost,but that's fixed now. 
+
+* there is now a missing reference in the first paragraph. OK
+
+* OK, let's go through Phil's comments first. 
+
+* Phil commenting on report that i'd already updated with ivo's comments. SO e.g. they had differente sentences in the end of the summary. Now Phil's. mention. OK
+
+* OK, now remove two summary rows. OK
+
+* last thing, there is a problem with the congestion charge for 2019.. I forgot to add it completely. Also, the 19/20 budget does not report the budgeted surlus for GLA, alhtough that might not be super important. 
 
 
 
+# Wednesday 26.11.2019
+
+* Ivo's updates from 25.11. 
+
+
+* remove nottingham references in bibliography. OK
+
+* WPL code is still in the script, and the existing data is in the tables in case this ever needs to be revisited. it won't show in the reports anywhere. but i'll remove it from the output csv just in case. ok.
+
+* throw out map references as well in england. ok.
+
+* but we're missing scotland and wales references for the comparison. fixed.
+
+* also fixed for Scotland and wales to make sure they have the references only for the most recent year for the other two countires. ok.
+
+* commit
+
+* add back scotland 2017-2018 data into my repo! This means adding stuff back to 00-original data entry, downloading the three files again. LOL, this first didn't work, why? because the outturn data file has in the mean time been updated, to now match the template from previous years. not how it was a few months ago.. anyway, all good now. 
+
+* ffs, no, it's not, because they removed the name of the authority in the 2017/18 excel sheets, they used to be in the A1 or A2 cell, now they're not. maybe i can read them from the name of the worksheets? and what if they change it again?! OK, read from sheet name now. 
+
+* still not ok, also the dpe status table for 2017 is fucked. argh, 01-import needs to be fixed as well. 
+
+* now test scotland 2017/18. ok, seems fine.
+
+* commit
+
+* *note to self*: make removal of countr/data eminently reversible i.e. revert immediately and have Ivo download the intermediate repo version. 
+
+* Damn, i fixed the NA budget for 2018, but it's wrong again!? where did i loose that? fix it again. OK, so it's transport total that's missing for 2018, seems to be overwritten? This is the england total. OK
+
+* also, the comparison table is missing in the wales report,  should be put back in.OK
+
+* there's sth wrong with the tables in tech documentation... ok now. 
+
+# Thursday 28.11.2019
+
+* OK, fix the total transport for england that got overwritten with the merge of the new data. DONE.
+
+* fix column widths in summary england table to make sure % sign is in same row. OK. 
+
+* commit. 
+
+* OK, now add the comparison table to wales. 
+
+* check how many LAs the the budget data for next year is  reported for. 345 of them 
+
+These 15 are missing in the budget:
+
+   year           auth.name auth.code
+1  2018               Poole     E1201
+2  2018         Bournemouth     E1202
+3  2018              Dorset     E1221
+4  2018        Christchurch     E1232
+5  2018         East Dorset     E1233
+6  2018        North Dorset     E1234
+7  2018             Purbeck     E1236
+8  2018         West Dorset     E1237
+9  2018 Weymouth & Portland     E1238
+10 2018       Taunton Deane     E3333
+11 2018       West Somerset     E3335
+12 2018        Forest Heath     E3532
+13 2018      St Edmundsbury     E3535
+14 2018     Suffolk Coastal     E3536
+15 2018             Waveney     E3537
+
+and these five are new:
+
+1 2019                              Dorset     E1203
+2 2019 Bournemouth, Christchurch and Poole     E1204
+3 2019           Somerset West and Taunton     E3336
+4 2019                        East Suffolk     E3538
+5 2019                        West Suffolk     E3539
+
+But these seem to have all been merged, so all good. 
+
+* return two wales tables back.
+
+* found a mistake, in the comparison tables, when it looked at most recent year, it actually looked at most recent not newer than report. but that's wrong, it can be newer. fixed in scotland, wales and england, all good. checked to make sure the bibliographies are correct as well!ok. 
+
+* commit.
+
+* send to ivo.
+
+# Friday 29.11.2019
+
+* Ah, having changed the scotland data input to read the names of the LAs from the worksheet names, i need to remove the input for the cell with the LA name, especially since they probably won't exist in the future. OK
+
+* clean up user manual. 
+
+* remove all references to WPL in user manual and update script. ok. 
+
+* commit
+
+* add reference to renv into user manual.OK
+
+* move code to "do not touch" folder. and update user manual to reflect this. ok
+
+* test. OK. 
+
+* spell check user manual. ok. 
+
+* commit.
+
+* see what was wrong with the tables in the techincal documentationn Oh, it' using ---- to do a hline, this doens't work anymore!? Try updating the package first. OK, so this is a pandoc issue, will apparently start working again when 2.8 is out. see [here](https://stackoverflow.com/questions/58397380/error-producing-pdf-when-markdown-contains-a-horizontal-rule-or) or [here](https://chat.stackexchange.com/transcript/41?m=52094810#52094810). just remove the hline for now, who cares. 
+
+* only thing left now is the colours/shading in the tables. 
+
+* try a minrepex. hmm, seems like i cannot get striped to work in kableextra if it's latex? weird. to be continued. 
+
+# Monday 2.12.2019
+
+* didn't striped tables work once upon a time? check. Yes, they did. 
+* OK, this got broken, see [here](https://github.com/haozhu233/kableExtra/issues/372), looks like it won't get fixed. using manual width of columns would be the only way around it, because the problem is in "full width", but doing htis manually would be too complicated i think... Noone seems to have noticed anyway?
+
+* *tip* careful with kableextra, especially since it depends on the latex package tabu, which has not been under active development since 2011.. it's great otherwise, but when bug happen, they tend to not have fixes. not sure what the alternative is. Just
+
+
+# Tuesday 24.12.2019
+
+renv error. opened issue https://github.com/rstudio/renv/issues/309
+
+# Monday 30.12.2019
+
+No response to renv error issue. Instead re-initialised renv. hopefully that works. 
+Hmm, no, not really, but running `sudo R CMD javareconf" a few times and restarting the computer seems to have done the trick.
+
+* Now compiling england gives an error though `Environment cslreferences undefined.`, which shouldn't happen, since i didn't change anything.. 
+
+* following this issue [here](https://github.com/rstudio/rmarkdown/issues/1649) i added `template: null` to the YAML and the error went away. 
+
+* but that's not a solution, it messes up the formatting, especially the font size and page width.. 
+
+* the issue is apparently [here](https://stackoverflow.com/questions/59193797/pandocs-environment-cslreferences-undefined-when-knitting-rmarkdown-to-pdf-in-r)
+
+* so first i'll try updating rmarkdown. 
+
+* ok, this now seems to work.
+
+* back to Ivo's comments from last week. 
+
+* up/down. increased/decreased.. if negative should be absolute. i guess i didn't make sure all of them were. so i'll have to go through the whole thing and double check. Done for England. Wales done. scotland as well., ok
+
+* fixed the expenditure code that switches between thousands and millions if the numbers are too low. check other reports for same code. none
+
+* also there are some points where 1000 millions need to be changed to billions. OK, england done. 
+
+* some small errors in england as well. 
+
+* Now check through wales. done .
+
+* sth odd happening with the references, there is a ref correctly spelled with England capitalised, but it is in small caps in the pdfs. Hope no one notices. 
+
+* Ah, ok, figured it out, the ref manager automatically uses lower case titles unless you put the title in {{}} double brackets.. fixed. 
+
+* commit. 
+
+* now check scotland as well. OK. 
+
+* commit. 
+
+# Wednesday 8.1.2020
+
+A few more comments from Phil. Mainly typos, two explanations emailed back. 
+
+* commit. 
+
+Add footnote and change higher to lower. 
+
+* commit. 
+
+# Thursday 9.1.2020
+
+* final commit - handover
 
 ### Wales (based on 17/18) #####################################################
 
